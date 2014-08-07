@@ -144,24 +144,61 @@ byte patternFrown2Smile [] =
   SMILE0,SMILE1,SMILE2,SMILE3,SMILE4
 };
 
+byte patternMesgEMPTY [] =
+{
+  E,M,P,T,Y,SPACE
+};
+
+byte patternMesgMEETING [] =
+{
+  M,E,E,T,I,N,G,SPACE
+};
+
+byte patternMesgCOURSE [] =
+{
+  C,O,U,R,S,E,SPACE
+};
+
+byte patternMesgSTUDY [] =
+{
+  S,T,U,D,Y,SPACE
+};
+
 byte *patternCompendium[] =
 {
-  patternHelloWorld,patternTest,patternFrown2Smile
+  patternHelloWorld,
+  patternTest,
+  patternFrown2Smile,
+  patternMesgEMPTY,
+  patternMesgMEETING,
+  patternMesgCOURSE,
+  patternMesgSTUDY
 };
 
 enum patternLib
 {
   numHelloWorld,
   numTest,
-  numFrown2Smile
+  numFrown2Smile,
+  numMesgEMPTY,
+  numMesgMEETING,
+  numMesgCOURSE,
+  numMesgSTUDY
 };
 byte patternSize[] = //manually set until elegant solution is found
 {
   sizeof(patternHelloWorld),
   sizeof(patternTest),
-  sizeof(patternFrown2Smile)
+  sizeof(patternFrown2Smile),
+  sizeof(patternMesgEMPTY),
+  sizeof(patternMesgMEETING),
+  sizeof(patternMesgCOURSE),
+  sizeof(patternMesgSTUDY)
 };
-int input = 0;
+
+
+int input = 7;//starting
+
 int symbol = 0;
 int pattern = 0;
 int sequence = 0;
@@ -247,47 +284,56 @@ void loop()
     {
       switch(input)
       {
-        case 1:
+        case 0:
         {
-          sequence = numHelloWorld;
+          sequence = numMesgEMPTY;
           boolAnimate = true;
           style = aniSlideLeft;
           numCycles = -1;
-          input = 0;
+          input = -1;
+          break;
+        }
+        case 1:
+        {
+          sequence = numMesgMEETING;
+          boolAnimate = true;
+          style = aniSlideLeft;
+          numCycles = -1;
+          input = -1;
           break;
         }
         case 2:
         {
-          sequence = numTest;
+          sequence = numMesgCOURSE;
           boolAnimate = true;
           style = aniSlideLeft;
-          numCycles = 2;
-          lingeringImage = QUESTION;
-          input = 0;
+          numCycles = -1;
+          input = -1;
           break;
         }
         case 3:
         {
-          setSymbol(SMILE);
-          //Serial.println("set smile");
-          boolAnimate = false;
-          input = 0;
+          sequence = numMesgSTUDY;
+          boolAnimate = true;
+          style = aniSlideLeft;
+          numCycles = -1;
+          input = -1;
           break;
         }
         case 4:
         {
-          setSymbol(FROWN);
-          //Serial.println("set frown");
+          setSymbol(SMILE);
+          //Serial.println("set smile");
           boolAnimate = false;
-          input = 0;
+          input = -1;
           break;
         }
         case 5:
         {
-          setSymbol(CATFACE);
-          //Serial.println("set catface");
+          setSymbol(FROWN);
+          //Serial.println("set frown");
           boolAnimate = false;
-          input = 0;
+          input = -1;
           break;
         }
         case 6:
@@ -297,29 +343,57 @@ void loop()
           style = aniAnimate;
           numCycles = 1;
           lingeringImage = SMILE4;
-          input = 0;
+          input = -1;
           break;
         }
         case 7:
         {
-          sequence = numHelloWorld;
-          boolAnimate = true;
-          style = aniSlideUp;
-          numCycles = -1;
-          lingeringImage = SMILE4;
-          input = 0;
+          setSymbol(CATFACE);
+          //Serial.println("set catface");
+          boolAnimate = false;
+          input = -1;
           break;
         }
         case 8:
         {
           sequence = numHelloWorld;
           boolAnimate = true;
+          style = aniSlideLeft;
+          numCycles = -1;
+          input = -1;
+          break;
+        }
+        case 9:
+        {
+          sequence = numTest;
+          boolAnimate = true;
+          style = aniSlideLeft;
+          numCycles = 2;
+          lingeringImage = QUESTION;
+          input = -1;
+          break;
+        }
+        case 10:
+        {
+          sequence = numHelloWorld;
+          boolAnimate = true;
+          style = aniSlideUp;
+          numCycles = -1;
+          lingeringImage = SMILE4;
+          input = -1;
+          break;
+        }
+        case 11:
+        {
+          sequence = numHelloWorld;
+          boolAnimate = true;
           style = aniAnimate;
           numCycles = 1;
           lingeringImage = QUESTION;
-          input = 0;
+          input = -1;
           break;
         }
+
         default:
         {
           //pattern = 0;
