@@ -11,6 +11,7 @@
 
 //#include <FrequencyTimer2.h>
 #include <TimerOne.h>
+//#include <TimerThree.h>
 #include <avr/pgmspace.h>
 #include "Symbols.h"
 
@@ -214,7 +215,7 @@ enum animateStyle
 int numCycles = -1;
 int lingeringImage;
 
-int timeUpdate = 0;
+volatile unsigned int timeUpdate = 0;
 bool commandProcessed;
 
 YunServer server;
@@ -264,7 +265,7 @@ void setup() {
 
 void loop() 
 {
-  
+  Serial.println(timeUpdate);
   
   YunClient client = server.accept();
   
@@ -273,7 +274,11 @@ void loop()
     process(client);
     client.stop();
   }
-  
+  if(timeUpdate>150000)
+  {
+    timeUpdate = 0;
+    //update display
+  }
   //while(Serial.available() > 0)
   {
     
@@ -569,6 +574,10 @@ void display() {
     }
   }
   digitalWrite(rows[row], LOW); // Turn whole column on at once (for equal lighting times)
+  
+  //update
+  timeUpdate++;
+  
 }
 
 void process(YunClient client)
@@ -576,5 +585,7 @@ void process(YunClient client)
   String command = client.readStringUntil('/');
   input = command.toInt();
   pattern = 0;
+  
+  
   
 }
