@@ -14,10 +14,12 @@
 //#include <TimerThree.h>
 #include <avr/pgmspace.h>
 #include "Symbols.h"
+#include "roomInfo.h"
 
 #include <Bridge.h>
 #include <YunServer.h>
 #include <YunClient.h>
+#include <HttpClient.h>
 
 
 
@@ -131,13 +133,13 @@ enum symbolLib
 
 byte patternHelloWorld [] =//start with space
 {
-  H,E,L,L,O,SPACE,W,O,R,L,D,EXCLAIM
+  SPACE,H,E,L,L,O,SPACE,W,O,R,L,D,EXCLAIM
 };
 
 
 byte patternTest [] =//start with space
 {
-  A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z,SPACE
+  SPACE,A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z
 };
 
 byte patternFrown2Smile [] =
@@ -147,22 +149,22 @@ byte patternFrown2Smile [] =
 
 byte patternMesgEMPTY [] =
 {
-  E,M,P,T,Y,SPACE
+  SPACE,E,M,P,T,Y
 };
 
 byte patternMesgMEETING [] =
 {
-  M,E,E,T,I,N,G,SPACE
+  SPACE,M,E,E,T,I,N,G
 };
 
 byte patternMesgCOURSE [] =
 {
-  C,O,U,R,S,E,SPACE
+  SPACE,C,O,U,R,S,E
 };
 
 byte patternMesgSTUDY [] =
 {
-  S,T,U,D,Y,SPACE
+  SPACE,S,T,U,D,Y
 };
 
 byte *patternCompendium[] =
@@ -215,7 +217,10 @@ enum animateStyle
 int numCycles = -1;
 int lingeringImage;
 
-volatile unsigned int timeUpdate = 0;
+volatile unsigned long int timeUpdate = 150000;
+String roomStatus;
+
+
 bool commandProcessed;
 
 YunServer server;
@@ -265,7 +270,7 @@ void setup() {
 
 void loop() 
 {
-  Serial.println(timeUpdate);
+  //Serial.println(timeUpdate);
   
   YunClient client = server.accept();
   
@@ -274,10 +279,16 @@ void loop()
     process(client);
     client.stop();
   }
-  if(timeUpdate>150000)
+  //Serial.println(timeUpdate);
+  if(timeUpdate>150000)//150000
   {
     timeUpdate = 0;
     //update display
+    roomStatus = getStatus(currentRoom);
+    //Serial.println("Update" + roomStatus);
+    input = statusToInput(roomStatus);
+    
+    
   }
   //while(Serial.available() > 0)
   {
@@ -291,6 +302,7 @@ void loop()
       {
         case 0:
         {
+          pattern = 0;
           sequence = numMesgEMPTY;
           boolAnimate = true;
           style = aniSlideLeft;
@@ -300,6 +312,7 @@ void loop()
         }
         case 1:
         {
+          pattern = 0;
           sequence = numMesgMEETING;
           boolAnimate = true;
           style = aniSlideLeft;
@@ -309,6 +322,7 @@ void loop()
         }
         case 2:
         {
+          pattern = 0;
           sequence = numMesgCOURSE;
           boolAnimate = true;
           style = aniSlideLeft;
@@ -318,6 +332,7 @@ void loop()
         }
         case 3:
         {
+          pattern = 0;
           sequence = numMesgSTUDY;
           boolAnimate = true;
           style = aniSlideLeft;
@@ -343,6 +358,7 @@ void loop()
         }
         case 6:
         {
+          pattern = 0;
           sequence = numFrown2Smile;
           boolAnimate = true;
           style = aniAnimate;
@@ -361,6 +377,7 @@ void loop()
         }
         case 8:
         {
+          pattern = 0;
           sequence = numHelloWorld;
           boolAnimate = true;
           style = aniSlideLeft;
@@ -370,6 +387,7 @@ void loop()
         }
         case 9:
         {
+          pattern = 0;
           sequence = numTest;
           boolAnimate = true;
           style = aniSlideLeft;
@@ -380,6 +398,7 @@ void loop()
         }
         case 10:
         {
+          pattern = 0;
           sequence = numHelloWorld;
           boolAnimate = true;
           style = aniSlideUp;
@@ -390,6 +409,7 @@ void loop()
         }
         case 11:
         {
+          pattern = 0;
           sequence = numHelloWorld;
           boolAnimate = true;
           style = aniAnimate;
@@ -585,7 +605,45 @@ void process(YunClient client)
   String command = client.readStringUntil('/');
   input = command.toInt();
   pattern = 0;
+}
+
+String getStatus(String room){
+  Console.print("get room status:");
+  Console.println(room);
+  String url_str = "fetch url:"+api_url_for_room+"?location="+room+"&for_display=1";
+  Console.println(url_str);
+  HttpClient client; 
+  client.get(api_url_for_room+"?location="+room+"&for_display=1");
+  String response = "";
+  while (client.available()) {
+    char c = client.read();
+    response += c;
+  }
+  response.trim();
+  Console.println(response);
   
+  return response;
+}
+
+int statusToInput(String state)
+{
+  int command;
+  if(state == "Empty")
+  {
+    command = 0;
+  }
+  else if(state == "Meeting")
+  {
+    command = 1;
+  }
+  else if(state == "Course")
+  {
+    command = 2;
+  }
+  else if(state == "Study")
+  {
+    command = 3;
+  }
   
-  
+  return command;
 }
